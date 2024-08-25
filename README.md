@@ -25,7 +25,7 @@ The MCTS algorithm consists of four main steps:
 
 1. **Selection**: Starting from the root node, select successive child nodes down to a leaf node. The selection of child nodes is based on the Upper Confidence Bound for Trees (UCT) formula:
 
-   $$UCT = \frac{w_i}{n_i} + C\sqrt{\frac{\ln(N_i)}{n_i}}$$
+   $$\large UCT = \frac{w_i}{n_i} + C\sqrt{\frac{\ln(N_i)}{n_i}}$$
 
    Where:
    - $w_i$ = Number of wins after the i-th move
