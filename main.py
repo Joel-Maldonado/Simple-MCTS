@@ -151,7 +151,7 @@ def play_game() -> None:
     print("You are player 1, and the MCTS bot is player -1.\n")
     
     while True:
-        print(state)
+        t.visualize_state(state)
 
         if player == 1:
             valid_moves = t.get_valid_actions(state)
@@ -163,7 +163,7 @@ def play_game() -> None:
                 continue
         else:
             neutral_state = t.change_perspective(state, player)
-            action = MCTS(neutral_state, 1000)
+            action = MCTS(neutral_state, 10000)
             print(f"\nMCTS: {action}")
 
         state = t.get_next_state(state, action, player)
@@ -171,7 +171,7 @@ def play_game() -> None:
 
         # Game Over
         if outcome != -1:
-            print(state)
+            t.visualize_state(state)
             if outcome == 1:
                 if player == 1:
                     print("Player 1 has won!")

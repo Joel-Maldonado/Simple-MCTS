@@ -128,3 +128,20 @@ class TicTacToe:
             np.ndarray: The game state from the perspective of the given player.
         """
         return state * player
+
+    @staticmethod
+    def visualize_state(state: np.ndarray) -> None:
+        """
+        Visualize the current state of the game board.
+
+        Args:
+            state (np.ndarray): The current game state.
+        """
+        size = state.shape[0]
+        symbols = {1: "X", -1: "O", 0: " "}
+
+        for i in range(size):
+            row = " | ".join(symbols[cell] for cell in state[i])
+            print(row)
+            if i < size - 1:
+                print("-" * (4 * size - 3))
