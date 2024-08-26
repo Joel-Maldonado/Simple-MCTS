@@ -62,9 +62,9 @@ The project consists of three main Python files:
 2. `tictactoe.py`: Defines the Tic-Tac-Toe game rules and board representation.
 3. `elo.py`: Implements the Elo ranking system and runs tournaments between different MCTS versions.
 
-## Simple Results
+## Simple ELO Results
 
-After running 10,000 games in the Elo tournament, the following ratings were obtained using no evaluation function or heuristic other than random moves:
+After running 10,000 games of **Tic Tac Toe** in the Elo tournament, the following ratings were obtained using no evaluation function or heuristic other than random moves:
 
 ```
 Baseline (Random Moves without MCTS): 583.0899959499717
@@ -76,6 +76,16 @@ MCTS_1000_simulations: 1552.7563334435456
 ```
 
 These results show that increasing the number of simulations generally improves the performance of the MCTS algorithm, with diminishing returns as the simulation count gets very high.
+
+The same trend can be seen in **Connect 4**:
+```
+MCTS_1_simulation: 795.532090583524
+MCTS_50_simulations: 916.0576763249759
+MCTS_100_simulations: 1176.4267698705391
+MCTS_200_simulations: 1368.17264662214
+MCTS_500_simulations: 1430.9779996136263
+MCTS_1000_simulations: 1512.8328169851939
+```
 
 ---
 
