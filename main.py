@@ -74,7 +74,8 @@ class Node:
             self.actions_available, np.where(self.actions_available == action)
         )
 
-        child_state = t.get_next_state(self.state, action, 1)
+        child_state = self.state.copy()
+        child_state = t.get_next_state(child_state, action, 1)
         child_state = t.change_perspective(child_state, -1)
 
         child = Node(child_state, parent=self, action_taken=action)
