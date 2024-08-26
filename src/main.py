@@ -1,7 +1,7 @@
 import numpy as np
 from typing import Optional, List
-from tictactoe import TicTacToe as t
-
+from numba import njit
+import importlib
 
 class Node:
     """
@@ -11,6 +11,7 @@ class Node:
     def __init__(
         self,
         state: np.ndarray,
+        game,
         parent: Optional["Node"] = None,
         action_taken: Optional[int] = None,
     ) -> None:
@@ -19,17 +20,19 @@ class Node:
 
         Args:
             state (np.ndarray): The game state at this node.
+            game: The game module (either TicTacToe or Connect4).
             parent (Optional[Node]): The parent node.
             action_taken (Optional[int]): The action that led to this node.
         """
         self.state = state
+        self.game = game
         self.parent = parent
         self.action_taken = action_taken
         self.children: List[Node] = []
         self.num_visits = 0
         self.num_wins = 0
         self.C = np.sqrt(2)
-        self.actions_available = t.get_valid_actions(self.state)
+        self.actions_available = game.get_valid_actions(self.state)
 
     def uct(self) -> float:
         """
@@ -38,11 +41,7 @@ class Node:
         Returns:
             float: The UCT value.
         """
-        if self.num_visits == 0:
-            return float("inf")
-        return self.num_wins / self.num_visits + self.C * np.sqrt(
-            np.log(self.parent.num_visits) / self.num_visits
-        )
+        return uct(self.num_wins, self.num_visits, self.parent.num_visits, self.C)
 
     def is_fully_expanded(self) -> bool:
         """
@@ -75,10 +74,10 @@ class Node:
         )
 
         child_state = self.state.copy()
-        child_state = t.get_next_state(child_state, action, 1)
-        child_state = t.change_perspective(child_state, -1)
+        child_state = self.game.get_next_state(child_state, action, 1)
+        child_state = self.game.change_perspective(child_state, -1)
 
-        child = Node(child_state, parent=self, action_taken=action)
+        child = Node(child_state, self.game, parent=self, action_taken=action)
         self.children.append(child)
         return child
 
@@ -89,34 +88,40 @@ class Node:
         Returns:
             float: The outcome of the simulation.
         """
-        if t.is_terminal(self.state, self.action_taken):
-            return t.get_outcome(self.state, self.action_taken)
+        if self.game.is_terminal(self.state, self.action_taken):
+            return self.game.get_outcome(self.state, self.action_taken)
 
         rollout_state = self.state.copy()
         rollout_player = 1
 
         while True:
-            action = np.random.choice(t.get_valid_actions(rollout_state))
-            rollout_state = t.get_next_state(rollout_state, action, rollout_player)
+            action = np.random.choice(self.game.get_valid_actions(rollout_state))
+            rollout_state = self.game.get_next_state(rollout_state, action, rollout_player)
 
-            if t.is_terminal(rollout_state, action):
-                return t.get_outcome(rollout_state, action)
+            if self.game.is_terminal(rollout_state, action):
+                return self.game.get_outcome(rollout_state, action)
 
             rollout_player = -rollout_player
 
+@njit(cache=True)
+def uct(num_wins: int, num_visits: int, parent_visits: int, C: float):
+    if num_visits == 0:
+        return np.inf
+    return num_wins / num_visits + C * np.sqrt(np.log(parent_visits) / num_visits)
 
-def MCTS(state: np.ndarray, num_simulations: int) -> int:
+def MCTS(state: np.ndarray, num_simulations: int, game) -> int:
     """
     Perform Monte Carlo Tree Search to find the best action.
 
     Args:
         state (np.ndarray): The current game state.
         num_simulations (int): The number of simulations to run.
+        game: The game module (either TicTacToe or Connect4).
 
     Returns:
         int: The best action to take.
     """
-    root = Node(state)
+    root = Node(state, game)
 
     for _ in range(num_simulations):
         node = root
@@ -126,7 +131,7 @@ def MCTS(state: np.ndarray, num_simulations: int) -> int:
             node = node.best_child()
 
         # Expansion
-        if not t.is_terminal(node.state, node.action_taken):
+        if not game.is_terminal(node.state, node.action_taken):
             node = node.expand()
 
         # Simulation
@@ -141,38 +146,46 @@ def MCTS(state: np.ndarray, num_simulations: int) -> int:
 
     return max(root.children, key=lambda c: c.num_visits).action_taken
 
+def play_game(game, num_simulations: int) -> None:
+    """
+    Play a game with an MCTS bot.
 
-def play_game() -> None:
+    Args:
+        game: The game module (either TicTacToe or Connect4).
     """
-    Play a game of Tic-Tac-Toe with an MCTS bot.
-    """
-    state = t.get_initial_state(3)
+    state = game.get_initial_state()
     player = 1
 
-    print("You are player 1, and the MCTS bot is player -1.\n")
+    print(f"You are player 1, and the MCTS bot is player -1.\n")
     
     while True:
-        t.visualize_state(state)
+        game.visualize_state(state)
 
         if player == 1:
-            valid_moves = t.get_valid_actions(state)
+            valid_moves = game.get_valid_actions(state)
             print(f"Valid moves: {valid_moves}")
-            action = int(input(f"{player}: "))
+            action = input(f"{player}: ")
+            if action.isdigit():
+                action = int(action)
+            else:
+                print("Invalid input!")
+                continue
+
 
             if action not in valid_moves:
                 print("Action not valid!")
                 continue
         else:
-            neutral_state = t.change_perspective(state, player)
-            action = MCTS(neutral_state, 10000)
+            neutral_state = game.change_perspective(state, player)
+            action = MCTS(neutral_state, num_simulations, game)
             print(f"\nMCTS: {action}")
 
-        state = t.get_next_state(state, action, player)
-        outcome = t.get_outcome(state, action)
+        state = game.get_next_state(state, action, player)
+        outcome = game.get_outcome(state, action)
 
         # Game Over
         if outcome != -1:
-            t.visualize_state(state)
+            game.visualize_state(state)
             if outcome == 1:
                 if player == 1:
                     print("Player 1 has won!")
@@ -184,6 +197,27 @@ def play_game() -> None:
 
         player = -player
 
+def main():
+    while True:
+        game_choice = input("Choose a game to play (1 for Tic-Tac-Toe, 2 for Connect4): ").strip()
+        if game_choice == '1':
+            game = importlib.import_module('games.tictactoe').TicTacToe
+            break
+        elif game_choice == '2':
+            game = importlib.import_module('games.connect4').Connect4
+            break
+        else:
+            print("Invalid choice. Please enter 1 or 2.")
+
+    
+    num_simulations = input("Enter the number of simulations for MCTS (Default 1000): ")
+    if num_simulations.isdigit():
+        num_simulations = int(num_simulations)
+    else:
+        num_simulations = 1000
+        print("Using default value of 1000 simulations")
+
+    play_game(game, num_simulations)
 
 if __name__ == "__main__":
-    play_game()
+    main()

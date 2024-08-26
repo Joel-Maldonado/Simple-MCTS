@@ -1,5 +1,5 @@
-from main import MCTS
-from tictactoe import TicTacToe as t
+from src.main import MCTS
+from src.games.tictactoe import TicTacToe as t
 from collections import defaultdict
 import math
 from tqdm import tqdm
@@ -116,12 +116,3 @@ if __name__ == "__main__":
     # Print the final Elo ratings
     for bot_name in mcts_versions.keys():
         print(f"{bot_name}: {elo_ranking.get_elo(bot_name)}")
-
-
-# -- ELOS -- 10000 games
-# MCTS_1_simulation: 583.0899959499717
-# MCTS_50_simulations: 1102.4090984116353
-# MCTS_100_simulations: 1296.5373273412813
-# MCTS_200_simulations: 1242.2460519124993
-# MCTS_500_simulations: 1422.9611929410578
-# MCTS_1000_simulations: 1552.7563334435456

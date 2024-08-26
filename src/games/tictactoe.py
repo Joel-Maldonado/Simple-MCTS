@@ -9,17 +9,14 @@ class TicTacToe:
     """
 
     @staticmethod
-    def get_initial_state(size: int) -> np.ndarray:
+    def get_initial_state() -> np.ndarray:
         """
         Initialize an empty Tic-Tac-Toe board.
-
-        Args:
-            size (int): The size of the board (e.g., 3 for a 3x3 board).
 
         Returns:
             np.ndarray: An empty game board as a 2D numpy array.
         """
-        return np.zeros((size, size), dtype=int)
+        return np.zeros((3, 3), dtype=int)
 
     @staticmethod
     def get_next_state(state: np.ndarray, action: int, player: int) -> np.ndarray:
@@ -54,7 +51,7 @@ class TicTacToe:
         return np.where(state.reshape(-1) == 0)[0]
 
     @staticmethod
-    def check_win(state: np.ndarray, action: int) -> bool:
+    def check_win(state: np.ndarray, last_action: int) -> bool:
         """
         Check if the last action resulted in a win.
 
@@ -65,11 +62,8 @@ class TicTacToe:
         Returns:
             bool: True if the last action resulted in a win, False otherwise.
         """
-        if action is None:
-            return False
-
         size = state.shape[0]
-        row, col = action // size, action % size
+        row, col = last_action // size, last_action % size
         player = state[row, col]
 
         # Check row, column, and diagonals
@@ -81,7 +75,7 @@ class TicTacToe:
         )
 
     @staticmethod
-    def is_terminal(state: np.ndarray, action: int) -> bool:
+    def is_terminal(state: np.ndarray, last_action: int = None) -> bool:
         """
         Check if the game has ended.
 
@@ -92,8 +86,10 @@ class TicTacToe:
         Returns:
             bool: True if the game has ended, False otherwise.
         """
+        if last_action is None:
+            return False
         return (
-            TicTacToe.check_win(state, action)
+            TicTacToe.check_win(state, last_action)
             or len(TicTacToe.get_valid_actions(state)) == 0
         )
 
