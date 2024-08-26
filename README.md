@@ -1,6 +1,6 @@
-# Monte Carlo Tree Search (MCTS) for Tic-Tac-Toe
+# Simple Monte Carlo Tree Search (MCTS) for Games
 
-This project implements a basic Monte Carlo Tree Search (MCTS) algorithm for playing Tic-Tac-Toe. It's primarily designed as an educational tool to demonstrate the fundamental concepts of a simple MCTS algorithm.
+This project implements a basic Monte Carlo Tree Search (MCTS) algorithm for playing Tic-Tac-Toe and Connect 4. It's primarily designed as an educational tool to demonstrate the fundamental concepts of a simple MCTS algorithm.
 
 ## Table of Contents
 1. [Project Overview](#project-overview)
@@ -10,7 +10,7 @@ This project implements a basic Monte Carlo Tree Search (MCTS) algorithm for pla
 
 ## Project Overview
 
-This project is an experimental implementation of the Monte Carlo Tree Search algorithm applied to the game of Tic-Tac-Toe. It's important to note that this is a learning exercise and not an optimized or highly competitive AI. The main goals of this project are:
+This project is an experimental implementation of the Monte Carlo Tree Search algorithm. It's important to note that this is a learning exercise and not an optimized or highly competitive AI. The main goals of this project are:
 
 1. To demonstrate how random playouts can lead to intelligent decision-making through the MCTS algorithm.
 2. To serve as a starting point for further experimentation and improvement.
@@ -41,6 +41,8 @@ The MCTS algorithm consists of four main steps:
 
 4. **Backpropagation**: Update the node statistics (visit count and win count) for all nodes in the path from the new node to the root.
 
+These steps can be looped for N amount of times leading to better outputs, but higher computation
+
 ### Advantages of Monte Carlo Tree Search
 
 1. **Domain-independent**: MCTS can be applied to various games and problem domains without extensive domain-specific knowledge.
@@ -50,17 +52,17 @@ The MCTS algorithm consists of four main steps:
 
 ### Limitations of This Implementation
 
-1. **Simple rollout policy**: Our implementation uses random playouts, which may not be optimal for complex games.
-2. **Simplicity of Tic-Tac-Toe**: Tic-Tac-Toe has a very small action space, and thus doesn't make very much use of MCTS's asymmetric tree growth as much as other games with a large action space.
-3. **Computationally intensive**: Achieving strong play often requires a large number of simulations, which can be time-consuming.
+1. **Simple rollout policy**: Our implementation uses random playouts. Creating an evaluation function can greatly improve the results.
+2. **Computationally intensive**: Achieving strong play often requires a large number of simulations, which can be time-consuming.
 
 ## Project Structure
 
-The project consists of three main Python files:
+The project consists of 4 main Python files:
 
-1. `main.py`: Contains the MCTS implementation and the main game loop.
-2. `tictactoe.py`: Defines the Tic-Tac-Toe game rules and board representation.
-3. `elo.py`: Implements the Elo ranking system and runs tournaments between different MCTS versions.
+1. `src/main.py`: Contains the MCTS implementation and the main game loop.
+2. `src/elo.py`: Implements the Elo ranking system and runs tournaments between different MCTS versions **(Might need to modify to code directly)**
+3. `games/tictactoe.py`: Defines the Tic-Tac-Toe game rules and board representation.
+4. `games/connect4.py`: Defines the Connect 4 game rules and board representation.
 
 ## Simple ELO Results
 
@@ -95,13 +97,11 @@ While this project serves as a good introduction to MCTS, there are several ways
 
 1. **Evaluation Function**: Implementing a heuristic evaluation function for non-terminal states could significantly improve the quality of playouts and overall performance.
 
-2. **Neural Network Integration**: Following the approach of algorithms like AlphaZero, incorporating a neural network for both policy and value estimation could drastically improve the AI's playing strength and efficiency.
+2. **Neural Network Integration**: Following the approach of algorithms like AlphaZero or MuZero, incorporating a neural network for both policy and value estimation could drastically improve the AI's playing strength and efficiency.
 
 3. **Parallelization**: The current implementation could be optimized to take better advantage of parallel processing, allowing for more simulations in less time.
 
 4. **Progressive Widening**: For games with larger branching factors, techniques like progressive widening could be implemented to manage the expansion of nodes more efficiently.
-
-5. **Domain-Specific Heuristics**: For Tic-Tac-Toe specifically, incorporating simple heuristics (like prioritizing center and corner moves) could improve performance without compromising the educational value of the base MCTS implementation.
 
 6. **RAVE (Rapid Action Value Estimation)**: This enhancement to MCTS could provide faster convergence to good policies in many games.
 
